@@ -10,6 +10,9 @@
 
 import random
 
+# Comemnt for Caleb: have everything BUT need to add stuff to the environment map func. Need to check the percepts, 
+# calculate the position of the cells, update the map with new cells and mark them as unexplored if they are not walls
+# queue unexplored cells for future exploration and also do an if check for a wall so you dont add it to the unexplored set
 
 class AI:
     def __init__(self):
@@ -18,7 +21,15 @@ class AI:
         to initialize any data or data structures you need.
         """
         self.turn = 0
-
+        self.position = (0, 0)
+        # Dictionary represents what the environment looks like, with keys being the coordinates (x, y) 
+        # and values representing 'g', 'w', and 'r'
+        self.map = {}
+        self.visited = set() # Set that tracks all visited cells
+        # A first in first out queue for BFS to keep track of the cells the agent has seen but hasn't visited
+        self.unexplored = [] 
+        self.exit_found = False # Checks if the agent found the exit
+    
     def update(self, percepts):
         """
         PERCEPTS:
@@ -43,6 +54,78 @@ class AI:
 
         The same goes for goal hexes (0, 1, 2, 3, 4, 5, 6, 7, 8, 9).
         """
+        self.turn += 1 # Increments the turn every move
+
+        # Updates the environment we created based on the current percepts
+        self.update_environment(percepts)
+
+        # Checks if the agent is currently on the exit cell
+        if percepts['X'][0] == 'r':
+            self.exit_found = True  # Marks that the exit has been found
+            return 'U'  # Uses the exit if the agent is on the exit cell
         
+        # Decides the next move based on unexplored areas or random movement
+        next_move = self.next_move()
+
+        # Updates the change in agent's position based on the chosen move
+        change_x, change_y = self.get_changeInDirection(next_move)
+        current_x, current_y = self.position
+        self.position = (current_x + change_x, current_y + change_y)
+        
+        return next_move  # Returns the 'N', 'S', 'E', or 'W' as a move command
+
+    def update_environment(self, percepts):
+
+        directions = ['N', 'E', 'S', 'W']
+        current_x, current_y = self.position  # Gets the position of the agent
+
+        # Checks if the current cell was visited and stores the type of the cell
+        if percepts['X'][0] not in self.visited:
+            self.visited.add((current_x, current_y))  # Adds the current cell to the visited set if there is a need for that
+            self.map[(current_x, current_y)] = percepts['X'][0]  # Stores the cell type
+
+        # Here is supposed to be a for loop (or rather nested loops and an if?) for checking the percepts in each direction and updating the map in general
+
+
+    # Helper functions below
+
+    # This functions gets the change (delta) in coordinates for a specific direction
+    # It returns a tuple that represents the movement in that direction
+    def get_changeInDirection(self, direction):
+        # 1 and -1 represent movement up, down, left and right on a coordinate plane
+        changes = {'N': (0, 1), 'E': (1, 0), 'S': (0, -1), 'W': (-1, 0)}
+        return changes[direction]
+
+
+    # This function figures out which direction the agent should move to get from its current position to the
+    # target cell by comparing the coordinates. It returns the direction to reach the given cell
+    def which_direction(self, next_position):
+
+        current_x, current_y = self.position
+        next_x, next_y = next_position
+        
+        if next_x > current_x:
+            return 'E' # The target cell is to the right (next x direction is larger)
+        elif next_x < current_x:    
+            return 'W' # The target cell is to the left of the agent (the x coordinate is smaller)
+        elif next_y < current_y:
+            return 'S' # The target cell is below the agent on the y-axis (the y coordinate is smaller)
+        elif next_y > current_y:
+            return 'N' # The target cell is above the agent (the y coordinate is larger)
+
+    # Move stuff
+
+    # This function decides the next move based on the unexplored cells. If there are any unexplore cells,
+    # it moves towards the closest one. If there are no unexplored cells, chooses random direction to move
+    # It returns a move command (Zach's line)
+    def next_move(self):
+
+        if self.unexplored:
+            next_position = self.unexplored(0) # Gets the next unexplored cell from the queue by popping it
+            # Gets information on which direction to move to reach the unexplored cell from a helper function
+            move = self.which_direction(next_position)
+            return move
+        
+        # Picks a random direction to move if there are no cells left
         return random.choice(['N', 'S', 'E', 'W'])
-    
+
