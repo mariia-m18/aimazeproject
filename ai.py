@@ -1,4 +1,4 @@
-# NAME(S): [PLACE YOUR NAME(S) HERE]
+# NAME(S): [Mariia Maksymenko, Caleb Thurston]
 #
 # APPROACH: [WRITE AN OVERVIEW OF YOUR APPROACH HERE.]
 #     Please use multiple lines (< ~80-100 char) for you approach write-up.
@@ -7,6 +7,17 @@
 #
 #     In-code comments DO NOT count as a description of
 #     of your approach.
+#
+# Our code is to try to implement an algorithm thats like a 
+# Breadth First Search. Our agent is coded to take in it's percepts
+# and at certain intervals (like when there is multiple paths for
+# it to go down) decide which path to go down based on if it
+# is stored as a location that it has already been too. To 
+# implement this, we have a coordinate system for keeping track
+# of where the agent is in regards to where it started, aka it's
+# origin. We also have a list to store places where it has already been
+# as well as a list to store where it has seen cells that are
+# unexplored. 
 
 import random
 
@@ -98,7 +109,7 @@ class AI:
                     # Updates the map of the environment with new cells and marks them as unexplored if they are not walls
                     self.map[(new_x, new_y)] = cell
                     if cell != 'w':  # Ignores walls for the unexplored cells
-                        self.unexplored((new_x, new_y))  # Queues unexplored cells for the future movement
+                        self.unexplored.append((new_x, new_y))  # Queues unexplored cells for the future movement
 
     # Helper functions below
 
@@ -106,7 +117,7 @@ class AI:
     # It returns a tuple that represents the movement in that direction
     def get_changeInDirection(self, direction):
         # 1 and -1 represent movement up, down, left and right on a coordinate plane
-        changes = {'N': (0, 1), 'E': (1, 0), 'S': (0, -1), 'W': (-1, 0)}
+        changes = {'N': (0, -1), 'E': (1, 0), 'S': (0, 1), 'W': (-1, 0)}
         return changes[direction]
 
 
@@ -125,6 +136,8 @@ class AI:
             return 'S' # The target cell is below the agent on the y-axis (the y coordinate is smaller)
         elif next_y > current_y:
             return 'N' # The target cell is above the agent (the y coordinate is larger)
+        else:
+            return random.choice(['N', 'S', 'E', 'W'])  # In case of no valid move
 
     # Move stuff
 
@@ -134,7 +147,7 @@ class AI:
     def next_move(self):
 
         if self.unexplored:
-            next_position = self.unexplored(0) # Gets the next unexplored cell from the queue by popping it
+            next_position = self.unexplored.pop(0) # Gets the next unexplored cell from the queue by popping it
             # Gets information on which direction to move to reach the unexplored cell from a helper function
             move = self.which_direction(next_position)
             return move
