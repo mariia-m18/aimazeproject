@@ -85,7 +85,20 @@ class AI:
             self.map[(current_x, current_y)] = percepts['X'][0]  # Stores the cell type
 
         # Here is supposed to be a for loop (or rather nested loops and an if?) for checking the percepts in each direction and updating the map in general
-
+        # Checks the cells in percepts in each of the four directions
+        for i, dir in enumerate(directions):
+            # Gets the coordinate change for the direction
+            change_x, change_y = self.get_changeInDirection(dir)
+            for distance, cell in enumerate(percepts[dir]):
+                # Calculates the position of the cell in that direction
+                new_x = current_x + (change_x * (distance + 1))
+                new_y = current_y + (change_y * (distance + 1))
+                
+                if (new_x, new_y) not in self.map:
+                    # Updates the map of the environment with new cells and marks them as unexplored if they are not walls
+                    self.map[(new_x, new_y)] = cell
+                    if cell != 'w':  # Ignores walls for the unexplored cells
+                        self.unexplored((new_x, new_y))  # Queues unexplored cells for the future movement
 
     # Helper functions below
 
