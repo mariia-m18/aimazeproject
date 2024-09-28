@@ -40,6 +40,7 @@ class AI:
         # A first in first out queue for BFS to keep track of the cells the agent has seen but hasn't visited
         self.unexplored = [] 
         self.exit_found = False # Checks if the agent found the exit
+        self.prev_move = 0                                                                                                  #cat add
     
     def update(self, percepts):
         """
@@ -75,23 +76,36 @@ class AI:
             self.exit_found = True  # Marks that the exit has been found
             return 'U'  # Uses the exit if the agent is on the exit cell
         
-        # Decides the next move based on unexplored areas or random movement
+        # Decides the next move based on unexplored areas or random movement                                                                                                   #cat move
         next_move = self.next_move()
+        
 
         # Updates the change in agent's position based on the chosen move
         change_x, change_y = self.get_changeInDirection(next_move)
         current_x, current_y = self.position
         self.position = (current_x + change_x, current_y + change_y)
         
-        return next_move  # Returns the 'N', 'S', 'E', or 'W' as a move command
+        #shit ton of print statements for debugging
+        # print(next_move)
+        # print(self.position)
+        # print(self.visited)
+        # print(self.map)
+        # print(self.unexplored)
+        # print(next_move)
+        # print(next_move)
+        print(percepts['X'][0])
 
+        
+        return next_move  # Returns the 'N', 'S', 'E', or 'W' as a move command
+        
+        
     def update_environment(self, percepts):
 
         directions = ['N', 'E', 'S', 'W']
         current_x, current_y = self.position  # Gets the position of the agent
 
         # Checks if the current cell was visited and stores the type of the cell
-        if percepts['X'][0] not in self.visited:
+        if self.position not in self.visited:                                                                                                           #Changed by cat
             self.visited.add((current_x, current_y))  # Adds the current cell to the visited set if there is a need for that
             self.map[(current_x, current_y)] = percepts['X'][0]  # Stores the cell type
 
@@ -110,6 +124,8 @@ class AI:
                     self.map[(new_x, new_y)] = cell
                     if cell != 'w':  # Ignores walls for the unexplored cells
                         self.unexplored.append((new_x, new_y))  # Queues unexplored cells for the future movement
+        
+        
 
     # Helper functions below
 
@@ -137,7 +153,7 @@ class AI:
         elif next_y > current_y:
             return 'N' # The target cell is above the agent (the y coordinate is larger)
         else:
-            return random.choice(['N', 'S', 'E', 'W'])  # In case of no valid move
+            return 'N'                                                                                                                                  #cat change
 
     # Move stuff
 
@@ -153,5 +169,5 @@ class AI:
             return move
         
         # Picks a random direction to move if there are no cells left
-        return random.choice(['N', 'S', 'E', 'W'])
+        return self.prev_move
 
