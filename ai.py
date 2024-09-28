@@ -40,7 +40,6 @@ class AI:
         # A first in first out queue for BFS to keep track of the cells the agent has seen but hasn't visited
         self.unexplored = [] 
         self.exit_found = False # Checks if the agent found the exit
-        self.prev_move = 0                                                                                                  #cat add
     
     def update(self, percepts):
         """
@@ -76,9 +75,8 @@ class AI:
             self.exit_found = True  # Marks that the exit has been found
             return 'U'  # Uses the exit if the agent is on the exit cell
         
-        # Decides the next move based on unexplored areas or random movement                                                                                                   #cat move
+        # Decides the next move based on unexplored areas or random movement
         next_move = self.next_move()
-        
 
         # Updates the change in agent's position based on the chosen move
         change_x, change_y = self.get_changeInDirection(next_move)
@@ -93,7 +91,6 @@ class AI:
         # print(self.unexplored)
         # print(next_move)
         # print(next_move)
-        print(percepts['X'][0])
 
         
         return next_move  # Returns the 'N', 'S', 'E', or 'W' as a move command
@@ -153,7 +150,7 @@ class AI:
         elif next_y > current_y:
             return 'N' # The target cell is above the agent (the y coordinate is larger)
         else:
-            return 'N'                                                                                                                                  #cat change
+            return random.choice(['N', 'S', 'E', 'W'])  # In case of no valid move
 
     # Move stuff
 
@@ -169,5 +166,5 @@ class AI:
             return move
         
         # Picks a random direction to move if there are no cells left
-        return self.prev_move
+        return random.choice(['N', 'S', 'E', 'W'])
 
